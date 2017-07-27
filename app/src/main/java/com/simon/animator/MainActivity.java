@@ -27,11 +27,13 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                animatorTest();
-//                evaluatorTest();
-//                evaluatorValueAnimatorTest();
-//                  evaluatorObjectAnimatorTest();
-                 evaluatortAnimatorSetTest();
+//                 animatorTest();
+//                 evaluatorTest();
+//                 evaluatorValueAnimatorTest();
+//                 evaluatorObjectAnimatorTest();
+//                 evaluatortAnimatorSetTest();
+//                interpolatorAnimatorSetTest();
+                 viewPropertyAnimatorTest();
             }
         });
     }
@@ -173,5 +175,36 @@ public class MainActivity extends AppCompatActivity {
         animatorSet.start();
     }
 
+     //自定义补间器
+    private void interpolatorAnimatorSetTest() {
+        //自定义evaluator，计算动画过程中的过渡值，然后在onAnimationUpdate去动态刷新视图
+        Point point1=new Point(myAnimView.getWidth()/2,MyAnimView.REDIUS);
+        Point point2=new Point(myAnimView.getWidth()/2,myAnimView.getHeight()-MyAnimView.REDIUS);
+        ValueAnimator interpolatorAnimation=ValueAnimator.ofObject(new PointEvaluator(),point1,point2);
+        interpolatorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                Point mCurrentPoint=((Point)animation.getAnimatedValue());
+                myAnimView.setCurrentPoint(mCurrentPoint);
+                myAnimView.postInvalidate();
+                Log.i("PointValueY=",((Point)animation.getAnimatedValue()).getY()+ "");
+            }
+        });
+        interpolatorAnimation.setDuration(3000);
+//        interpolatorAnimation.setInterpolator(new BounceInterpolator());
+//        interpolatorAnimation.setInterpolator(new AnticipateInterpolator());
+//        interpolatorAnimation.setInterpolator(new AnticipateOvershootInterpolator());
+//         interpolatorAnimation.setInterpolator(new LinearInterpolator());
+//         interpolatorAnimation.setInterpolator(new CycleInterpolator(myAnimView.getWidth()/4));
+           interpolatorAnimation.setInterpolator(new DecelerateAccelerateInterpolator());
+           interpolatorAnimation.start();
+    }
+
+    /**
+     * 通过ViewPropertyAnimator的给view设置动画，调用方式简单，基本上能够覆盖补间动画的内容。但是有缺陷，不能设置重复模式
+     */
+    public  void viewPropertyAnimatorTest(){
+        textView.animate().setDuration(500).alphaBy(0).start();
+    }
 
 }
