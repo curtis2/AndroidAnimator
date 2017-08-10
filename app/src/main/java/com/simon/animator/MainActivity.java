@@ -12,6 +12,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.example.administrator.viewexplosion.ExplosionField;
+import com.example.administrator.viewexplosion.factory.FallingParticleFactory;
+
+import java.util.Random;
+
+
 public class MainActivity extends AppCompatActivity {
 
     TextView textView;
@@ -20,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        CrashHandleUtil.getmInstance().init(this,"mobileteacher_helper");
         setContentView(R.layout.activity_main);
         textView= (TextView) findViewById(R.id.hello_animator);
         button= (Button) findViewById(R.id.button);
@@ -27,16 +34,66 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                   explosionFieldTest();
+//                   shakeAnimatorTest();
+//                 animatorTestWithGone();
 //                 animatorTest();
 //                 evaluatorTest();
 //                 evaluatorValueAnimatorTest();
 //                 evaluatorObjectAnimatorTest();
 //                 evaluatortAnimatorSetTest();
 //                interpolatorAnimatorSetTest();
-                 viewPropertyAnimatorTest();
+//                 viewPropertyAnimatorTest();
             }
         });
     }
+
+    private ExplosionField mExplosionField;
+    /**
+     * 粒子动画效果
+     */
+    private void explosionFieldTest() {
+        //ValueAnimator对值进行了一个平滑的动画过渡，
+//        textView.setVisibility(View.VISIBLE);
+        ExplosionField explosionField = new ExplosionField(this,new FallingParticleFactory());
+        explosionField.explode(textView);
+    }
+
+
+    /**
+     * 震动动画
+     */
+    private void shakeAnimatorTest() {
+        textView.setVisibility(View.VISIBLE);
+        ValueAnimator animator = ValueAnimator.ofFloat(0f, 1f).setDuration(150);
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            Random random = new Random();
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                textView.setTranslationX((random.nextFloat() - 0.5f) * textView.getWidth() * 0.05f);
+                textView.setTranslationY((random.nextFloat() - 0.5f) * textView.getHeight() * 0.05f);
+            }
+        });
+        animator.start();
+    }
+
+
+    /**
+     * view的从无到有的显示动画
+     */
+    private void animatorTestWithGone() {
+        //ValueAnimator对值进行了一个平滑的动画过渡，
+        textView.setVisibility(View.VISIBLE);
+        //这里修改的时候textView的alpha属性，内部应该是通过在一个平衡过渡的时间段调用 View的setAlpha方法去不停通过视图重新绘制
+        ObjectAnimator objectAnimatorX=ObjectAnimator.ofFloat(textView,"scaleX",0.4f,1f);
+        ObjectAnimator objectAnimatorY=ObjectAnimator.ofFloat(textView,"scaleY",0.4f,1f);
+        ObjectAnimator alphaAnimator=ObjectAnimator.ofFloat(textView,"alpha",0f,1f);
+        AnimatorSet animatorSet=new AnimatorSet();
+        animatorSet.setDuration(1000);
+        animatorSet.play(objectAnimatorX).with(objectAnimatorY).with(alphaAnimator);
+        animatorSet.start();
+    }
+
 
     private void animatorTest() {
         //ValueAnimator对值进行了一个平滑的动画过渡，
@@ -67,10 +124,10 @@ public class MainActivity extends AppCompatActivity {
         });
 
        //组合动画AnimatorSet
-/*      after(Animator anim)   将现有动画插入到传入的动画之后执行
+/*      after(Animator anim_left)   将现有动画插入到传入的动画之后执行
         after(long delay)   将现有动画延迟指定毫秒后执行
-        before(Animator anim)   将现有动画插入到传入的动画之前执行
-        with(Animator anim)   将现有动画和传入的动画同时执行
+        before(Animator anim_left)   将现有动画插入到传入的动画之前执行
+        with(Animator anim_left)   将现有动画和传入的动画同时执行
         */
         ObjectAnimator translationAnimator=ObjectAnimator.ofFloat(textView,"translationY",400f,0f);//当前的translationY是基于自身当前位置的
         ObjectAnimator rotationAnimator=ObjectAnimator.ofFloat(textView,"rotation",0f,360f);
@@ -191,13 +248,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         interpolatorAnimation.setDuration(3000);
-//        interpolatorAnimation.setInterpolator(new BounceInterpolator());
-//        interpolatorAnimation.setInterpolator(new AnticipateInterpolator());
-//        interpolatorAnimation.setInterpolator(new AnticipateOvershootInterpolator());
-//         interpolatorAnimation.setInterpolator(new LinearInterpolator());
-//         interpolatorAnimation.setInterpolator(new CycleInterpolator(myAnimView.getWidth()/4));
-           interpolatorAnimation.setInterpolator(new DecelerateAccelerateInterpolator());
-           interpolatorAnimation.start();
+//      interpolatorAnimation.setInterpolator(new BounceInterpolator());
+//      interpolatorAnimation.setInterpolator(new AnticipateInterpolator());
+//      interpolatorAnimation.setInterpolator(new AnticipateOvershootInterpolator());
+//      interpolatorAnimation.setInterpolator(new LinearInterpolator());
+//      interpolatorAnimation.setInterpolator(new CycleInterpolator(myAnimView.getWidth()/4));
+        interpolatorAnimation.setInterpolator(new DecelerateAccelerateInterpolator());
+        interpolatorAnimation.start();
     }
 
     /**
